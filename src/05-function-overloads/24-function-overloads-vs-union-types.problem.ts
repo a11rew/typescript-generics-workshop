@@ -1,7 +1,20 @@
 import { expect, it } from "vitest";
 import { Equal, Expect } from "../helpers/type-utils";
 
-function runGenerator(generator: unknown) {
+type FunctionGenerator<T> = () => T;
+type ObjFunctionGenerator<T> = {
+  run: FunctionGenerator<T>;
+};
+
+function runGenerator<TGeneratorResult>(
+  generator: FunctionGenerator<TGeneratorResult>
+): TGeneratorResult;
+function runGenerator<TGeneratorResult>(
+  generator: ObjFunctionGenerator<TGeneratorResult>
+): TGeneratorResult;
+function runGenerator(
+  generator: FunctionGenerator<unknown> | ObjFunctionGenerator<unknown>
+) {
   if (typeof generator === "function") {
     return generator();
   }
