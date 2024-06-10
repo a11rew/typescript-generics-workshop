@@ -1,11 +1,37 @@
 import { expect, it } from "vitest";
 import { Equal, Expect } from "../helpers/type-utils";
 
-export const compose =
-  (...funcs: Array<(input: any) => any>) =>
-  (input: any) => {
+type Func = (input: any) => any;
+type ReduceMember<PrevFunc extends Func> = (input: ReturnType<PrevFunc>) => any;
+
+export function compose<Func1 extends Func, Func2 extends ReduceMember<Func1>>(
+  ...funcs: [Func1, Func2]
+): Func2;
+export function compose<
+  Func1 extends Func,
+  Func2 extends ReduceMember<Func1>,
+  Func3 extends ReduceMember<Func2>
+>(...funcs: [Func1, Func2, Func3]): Func3;
+export function compose<
+  Func1 extends Func,
+  Func2 extends ReduceMember<Func1>,
+  Func3 extends ReduceMember<Func2>,
+  Func4 extends ReduceMember<Func3>
+>(...funcs: [Func1, Func2, Func3, Func4]): Func4;
+export function compose<
+  Func1 extends Func,
+  Func2 extends ReduceMember<Func1>,
+  Func3 extends ReduceMember<Func2>,
+  Func4 extends ReduceMember<Func3>,
+  Func5 extends ReduceMember<Func4>
+>(...funcs: [Func1, Func2, Func3, Func4, Func5]): Func5;
+export function compose<TFuncs extends Array<(input: any) => any>>(
+  ...funcs: TFuncs
+) {
+  return (input: any) => {
     return funcs.reduce((acc, fn) => fn(acc), input);
   };
+}
 
 const addOne = (num: number) => {
   return num + 1;
@@ -27,6 +53,6 @@ it("Should error when the input to a function is not typed correctly", () => {
     // a function that returns a string!
     // @ts-expect-error
     String,
-    addOne,
+    addOne
   );
 });
